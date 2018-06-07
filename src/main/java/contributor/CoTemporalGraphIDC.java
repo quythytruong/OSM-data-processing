@@ -29,7 +29,8 @@ public class CoTemporalGraphIDC {
 		System.out.println("vertices " + cotemporalGraph.vertexSet().size());
 		System.out.println("edges " + cotemporalGraph.edgeSet().size());
 
-		SocialGraph.writeSimpleWeightedGraph2CSV(cotemporalGraph, new File("idf-idc-coTemporalGraph_2009-2012.csv"));
+		SocialGraph.writeSimpleWeightedGraph2CSV(cotemporalGraph, new File("idf-idc-coTemporalGraph_2009-2012.csv"),
+				(long) 111);
 
 	}
 

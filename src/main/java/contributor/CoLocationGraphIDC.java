@@ -29,7 +29,8 @@ public class CoLocationGraphIDC {
 		System.out.println("vertices " + colocationGraph.vertexSet().size());
 		System.out.println("edges " + colocationGraph.edgeSet().size());
 
-		SocialGraph.writeSimpleWeightedGraph2CSV(colocationGraph, new File("idf-idc-colocationGraph_2009-2012.csv"));
+		SocialGraph.writeSimpleWeightedGraph2CSV(colocationGraph, new File("idf-idc-colocationGraph_2009-2012.csv"),
+				Long.valueOf(111));
 
 	}
 

@@ -45,7 +45,7 @@ public class WitryLesReimsGraphs {
 		System.out.println("vertices " + coeditg.vertexSet().size());
 		System.out.println("edges " + coeditg.edgeSet().size());
 		// Export to csv
-		SocialGraph.writeGraph2CSV(coeditg, new File("witry-les-reims-coeditGraph_2010-2017.csv"));
+		SocialGraph.writeGraph2CSV(coeditg, new File("witry-les-reims-coeditGraph_2010-2017.csv"), Long.valueOf(111));
 
 	}
 }

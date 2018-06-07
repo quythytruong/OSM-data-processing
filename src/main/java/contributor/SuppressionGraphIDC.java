@@ -18,7 +18,7 @@ public class SuppressionGraphIDC {
 		loader.getDataFrombbox(bbox, timespan);
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressionGraph = SocialGraph
 				.createSuppressionGraph(loader.myJavaObjects);
-		SocialGraph.writeGraph2CSV(suppressionGraph, new File("idf-idc-suppressionGraph_2009-2012.csv"));
+		SocialGraph.writeGraph2CSV(suppressionGraph, new File("idf-idc-suppressionGraph_2009-2012.csv"), (long) 111);
 	}
 
 }
