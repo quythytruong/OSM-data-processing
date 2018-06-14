@@ -41,8 +41,6 @@ public class Katmandou {
 		// Make a summary of the contributors in Katmandou
 		HashMap<Long, OSMContributor> myContributors = ContributorAssessment
 				.contributorSummary(nepalLoader.myJavaObjects);
-		// ContributorAssessment.writeContributorSummary(myContributors,
-		// new File("Nepal/katmandou-contributors_2014-2017.csv"));
 
 		// Order contributions by object
 		// Nodes and ways
@@ -72,9 +70,7 @@ public class Katmandou {
 		System.out.println("vertices " + coeditg.vertexSet().size());
 		System.out.println("edges " + coeditg.edgeSet().size());
 
-		// SocialGraph.writeGraph2CSV(coeditg, new
-		// File("Nepal/katmandou-coeditiongraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export to csv
+
 
 		// Breadth of collaboration graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> widthg = SocialGraph.createCollaborationGraph(myObjects,
@@ -83,12 +79,7 @@ public class Katmandou {
 		System.out.println("Breadth of collaboration graph : ");
 		System.out.println("vertices " + widthg.vertexSet().size());
 		System.out.println("edges " + widthg.edgeSet().size());
-		// SocialGraph.writeGraph2CSV(widthg, new
-		// File("Nepal/katmandou-widthgraph_2014-2017.csv"), Long.valueOf(111));
-		// // Export
-		// to
-		// csv
-
+	
 		// Depth of collaboration graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> depthg = SocialGraph.createCollaborationGraph(myObjects,
 				myContributors, "depth");
@@ -96,9 +87,7 @@ public class Katmandou {
 		System.out.println("Depth of collaboration graph : ");
 		System.out.println("vertices " + depthg.vertexSet().size());
 		System.out.println("edges " + depthg.edgeSet().size());
-		// SocialGraph.writeGraph2CSV(depthg, new
-		// File("Nepal/katmandou-depthgraph_2014-2017.csv"), Long.valueOf(111));
-		// Export to csv
+	
 		// Use graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> useg = SocialGraph.createUseGraph2(myContributors,
 				wayObjects, nodeObjects, timespan[0]);
@@ -106,11 +95,6 @@ public class Katmandou {
 		System.out.println("Use graph : ");
 		System.out.println("vertices " + useg.vertexSet().size());
 		System.out.println("edges " + useg.edgeSet().size());
-		// SocialGraph.writeGraph2CSV(useg, new
-		// File("Nepal/katmandou-usegraph_2014-2017.csv"), Long.valueOf(111));
-		// // Export
-		// // to
-		// // csv
 
 		// Suppression graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressiong = SocialGraph
@@ -119,26 +103,16 @@ public class Katmandou {
 		System.out.println("Suppression graph : ");
 		System.out.println("vertices " + suppressiong.vertexSet().size());
 		System.out.println("edges " + suppressiong.edgeSet().size());
-		// SocialGraph.writeGraph2CSV(suppressiong, new
-		// File("Nepal/katmandou-suppressiongraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export to csv
 
 		// Co-location graph : threshold = 10000 i.e. les zones d'activités
 		// sont des polygones de côté < 10 km
-		// SimpleWeightedGraph<Long, DefaultWeightedEdge> colocationg =
-		// SocialGraph.createCoLocationGraph(myContributors,
-		// katmanduBoundaries, timespan, 10000, "6207");
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> colocationg = SocialGraph.createCoLocationGraph(myContributors,
 				nodesKatmandu, 10000, "6207");
 
 		System.out.println("Co-location graph : ");
 		System.out.println("vertices " + colocationg.vertexSet().size());
 		System.out.println("edges " + colocationg.edgeSet().size());
-		// SocialGraph.writeSimpleWeightedGraph2CSV(colocationg, new
-		// File("Nepal/katmandou-colocationgraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export
-		// // to
-		// // csv
+
 
 		// Co-temporal graph
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> cotempg = SocialGraph.createCoTemporalGraph(myContributors,
@@ -147,11 +121,6 @@ public class Katmandou {
 		System.out.println("Co-Temporal graph : ");
 		System.out.println("vertices " + cotempg.vertexSet().size());
 		System.out.println("edges " + cotempg.edgeSet().size());
-		// SocialGraph.writeSimpleWeightedGraph2CSV(cotempg, new
-		// File("Nepal/katmandou-co-temporalgraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export
-		// // to
-		// // csv
 
 		/******************************
 		 * Multiplex system processing
@@ -191,10 +160,7 @@ public class Katmandou {
 		// Transform into a monoplex graph
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> monoplexg = GraphAnalysis.monoplex(adjMultiplex,
 				contributorIndex);
-		SocialGraph.writeSimpleWeightedGraph2CSV(monoplexg, new File("Nepal/katmandou-monoplexg_2014-2017.csv"),
-				Long.valueOf(111)); // Export
-									// to
-									// csv
+
 
 	}
 }
