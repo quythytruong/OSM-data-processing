@@ -188,21 +188,10 @@ public class Katmandou {
 		adjMultiplex.add(adjacencyCoTemporalg);
 
 		// Transform into a monoplex graph
-		// SimpleWeightedGraph<Long, DefaultWeightedEdge> monoplexg =
-		// GraphAnalysis.monoplex(adjMultiplex,
-		// contributorIndex);
-		// SocialGraph.writeSimpleWeightedGraph2CSV(monoplexg, new
-		// File("Nepal/katmandou-monoplexg_2014-2017.csv"),
-		// Long.valueOf(111)); // Export
-		// // to
-		// // csv
-
-		// Write indicators
-		HashMap<Long, Double> cc1 = GraphAnalysis.clusteringCoefficient1(adjMultiplex, contributorIndex);
-		HashMap<Long, Double> cc2 = GraphAnalysis.clusteringCoefficient2(adjMultiplex, contributorIndex);
-		HashMap<Long, Double> participationList = GraphAnalysis.participationCoefficientMultiplex(adjMultiplex,
+		SimpleWeightedGraph<Long, DefaultWeightedEdge> monoplexg = GraphAnalysis.monoplex(adjMultiplex,
 				contributorIndex);
-		GraphAnalysis.writeIndicators(contributorIndex, adjMultiplex, participationList, cc1, cc2,
-				"Nepal/katmandou-multiplex-indicateurs_2014-2017.csv");
+
+		
+
 	}
 }
