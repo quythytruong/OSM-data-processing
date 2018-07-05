@@ -67,5 +67,21 @@
     		<artifactId>geoxygene-osm</artifactId>
     		<version>1.9-SNAPSHOT</version>
     	</dependency>
+    	<dependency>
+    		<groupId>fr.ign.cogit</groupId>
+    		<artifactId>cartagen</artifactId>
+    		<version>0.1-SNAPSHOT</version>
+    		<type>pom</type>
+    	</dependency>
+    	<dependency>
+    		<groupId>fr.ign.cogit</groupId>
+    		<artifactId>cartagen-appli</artifactId>
+    		<version>0.1-SNAPSHOT</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>fr.ign.cogit</groupId>
+    		<artifactId>cartagen-core</artifactId>
+    		<version>0.1-SNAPSHOT</version>
+    	</dependency>
     </dependencies>
 </project>

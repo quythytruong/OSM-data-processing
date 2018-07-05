@@ -18,47 +18,47 @@ import fr.ign.cogit.geoxygene.osm.importexport.metrics.ContributorAssessment;
 import fr.ign.cogit.geoxygene.osm.importexport.metrics.OSMResourceQualityAssessment;
 import fr.ign.cogit.geoxygene.osm.importexport.postgis.LoadFromPostGIS;
 
-public class Katmandou {
+public class Stuhr {
 	public static void main(String[] args) throws Exception {
 
-		LoadFromPostGIS nepalLoader = new LoadFromPostGIS("localhost", "5432", "nepal", "postgres", "postgres");
+		LoadFromPostGIS stuhrLoader = new LoadFromPostGIS("localhost", "5432", "bremen", "postgres", "postgres");
 		// Get the city boundaries
-		Double[] katmanduBoundaries = nepalLoader.getCityBoundary("काठमाडौं", "2015-06-01");
-		String[] timespan = { "2014-01-01", "2017-01-01" };
+		Double[] stuhrBoundaries = stuhrLoader.getCityBoundary("Stuhr", "2013-01-01");
+		String[] timespan = { "2009-01-01", "2013-01-01" };
 
 		// Load contributions
 		// Get nodes
-		Set<OSMResource> nodesKatmandu = nepalLoader.getEvolutionNode(katmanduBoundaries, timespan);
+		Set<OSMResource> nodesStuhr = stuhrLoader.getEvolutionNode(stuhrBoundaries, timespan);
 
 		// Get ways
-		Set<OSMResource> waysKatmandu = nepalLoader.getEvolutionWay(katmanduBoundaries, timespan);
+		Set<OSMResource> waysStuhr = stuhrLoader.getEvolutionWay(stuhrBoundaries, timespan);
 
-		nepalLoader.myJavaObjects.addAll(nodesKatmandu);
-		nepalLoader.myJavaObjects.addAll(waysKatmandu);
-		System.out.println("Size Myjavaobjects :" + nepalLoader.myJavaObjects.size());
+		stuhrLoader.myJavaObjects.addAll(nodesStuhr);
+		stuhrLoader.myJavaObjects.addAll(waysStuhr);
+		System.out.println("Size Myjavaobjects :" + stuhrLoader.myJavaObjects.size());
 
 		// Make a summary of the contributors in Katmandou
 		HashMap<Long, OSMContributor> myContributors = ContributorAssessment
-				.contributorSummary(nepalLoader.myJavaObjects);
+				.contributorSummary(stuhrLoader.myJavaObjects);
 		// ContributorAssessment.writeContributorSummary(myContributors,
-		// new File("Nepal/katmandou-contributors_2014-2017.csv"));
+		// new File("Allemagne/stuhr-contributors_2009-2013.csv"));
 
 		// Order contributions by object
 		// Nodes and ways
-		HashMap<Long, OSMObject> myObjects = OSMResourceQualityAssessment.groupByOSMObject(nepalLoader.myJavaObjects);
+		HashMap<Long, OSMObject> myObjects = OSMResourceQualityAssessment.groupByOSMObject(stuhrLoader.myJavaObjects);
 		System.out.println("Size myObjects " + myObjects.size());
 
 		// Nodes objects only
-		HashMap<Long, OSMObject> nodeObjects = OSMResourceQualityAssessment.groupByOSMObject(nodesKatmandu);
+		HashMap<Long, OSMObject> nodeObjects = OSMResourceQualityAssessment.groupByOSMObject(nodesStuhr);
 
 		// Way objects only
-		HashMap<Long, OSMObject> wayObjects = OSMResourceQualityAssessment.groupByOSMObject(waysKatmandu);
+		HashMap<Long, OSMObject> wayObjects = OSMResourceQualityAssessment.groupByOSMObject(waysStuhr);
 		for (OSMObject object : wayObjects.values())
 			for (OSMResource r : object.getContributions())
 				object.wayComposition.add(((OSMWay) r.getGeom()).getVertices());
 
 		// Configure Social Graph class static attribute
-		SocialGraph.dbName = "nepal";
+		SocialGraph.dbName = "bremen";
 
 		/************************
 		 * Graph creation
@@ -72,7 +72,7 @@ public class Katmandou {
 		System.out.println("edges " + coeditg.edgeSet().size());
 
 		// SocialGraph.writeGraph2CSV(coeditg, new
-		// File("Nepal/katmandou-coeditiongraph_2014-2017.csv"),
+		// File("Allemagne/stuhr-coeditiongraph_2009-2013.csv"),
 		// Long.valueOf(111)); // Export to csv
 
 		// Breadth of collaboration graph
@@ -83,10 +83,7 @@ public class Katmandou {
 		System.out.println("vertices " + widthg.vertexSet().size());
 		System.out.println("edges " + widthg.edgeSet().size());
 		// SocialGraph.writeGraph2CSV(widthg, new
-		// File("Nepal/katmandou-widthgraph_2014-2017.csv"), Long.valueOf(111));
-		// // Export
-		// to
-		// csv
+		// File("Allemagne/stuhr-widthgraph_2009-2013.csv"), Long.valueOf(111));
 
 		// Depth of collaboration graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> depthg = SocialGraph.createCollaborationGraph(myObjects,
@@ -96,7 +93,7 @@ public class Katmandou {
 		System.out.println("vertices " + depthg.vertexSet().size());
 		System.out.println("edges " + depthg.edgeSet().size());
 		// SocialGraph.writeGraph2CSV(depthg, new
-		// File("Nepal/katmandou-depthgraph_2014-2017.csv"), Long.valueOf(111));
+		// File("Allemagne/stuhr-depthgraph_2009-2013.csv"), Long.valueOf(111));
 		// Export to csv
 		// Use graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> useg = SocialGraph.createUseGraph2(myContributors,
@@ -106,10 +103,7 @@ public class Katmandou {
 		System.out.println("vertices " + useg.vertexSet().size());
 		System.out.println("edges " + useg.edgeSet().size());
 		// SocialGraph.writeGraph2CSV(useg, new
-		// File("Nepal/katmandou-usegraph_2014-2017.csv"), Long.valueOf(111));
-		// // Export
-		// // to
-		// // csv
+		// File("Allemagne/stuhr-usegraph_2009-2013.csv"), Long.valueOf(111));
 
 		// Suppression graph
 		DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressiong = SocialGraph
@@ -119,25 +113,20 @@ public class Katmandou {
 		System.out.println("vertices " + suppressiong.vertexSet().size());
 		System.out.println("edges " + suppressiong.edgeSet().size());
 		// SocialGraph.writeGraph2CSV(suppressiong, new
-		// File("Nepal/katmandou-suppressiongraph_2014-2017.csv"),
+		// File("Allemagne/stuhr-suppressiongraph_2009-2013.csv"),
 		// Long.valueOf(111)); // Export to csv
 
 		// Co-location graph : threshold = 10000 i.e. les zones d'activités
 		// sont des polygones de côté < 10 km
-		// SimpleWeightedGraph<Long, DefaultWeightedEdge> colocationg =
-		// SocialGraph.createCoLocationGraph(myContributors,
-		// katmanduBoundaries, timespan, 10000, "6207");
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> colocationg = SocialGraph.createCoLocationGraph(myContributors,
-				nodesKatmandu, 10000, "6207");
+				nodesStuhr, 10000, "5681");
 
 		System.out.println("Co-location graph : ");
 		System.out.println("vertices " + colocationg.vertexSet().size());
 		System.out.println("edges " + colocationg.edgeSet().size());
 		// SocialGraph.writeSimpleWeightedGraph2CSV(colocationg, new
-		// File("Nepal/katmandou-colocationgraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export
-		// // to
-		// // csv
+		// File("Allemagne/stuhr-colocationgraph_2009-2013.csv"),
+		// Long.valueOf(111));
 
 		// Co-temporal graph
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> cotempg = SocialGraph.createCoTemporalGraph(myContributors,
@@ -147,10 +136,8 @@ public class Katmandou {
 		System.out.println("vertices " + cotempg.vertexSet().size());
 		System.out.println("edges " + cotempg.edgeSet().size());
 		// SocialGraph.writeSimpleWeightedGraph2CSV(cotempg, new
-		// File("Nepal/katmandou-co-temporalgraph_2014-2017.csv"),
-		// Long.valueOf(111)); // Export
-		// // to
-		// // csv
+		// File("Allemagne/stuhr-co-temporalgraph_2009-2013.csv"),
+		// Long.valueOf(111));
 
 		/******************************
 		 * Multiplex system processing
@@ -188,21 +175,21 @@ public class Katmandou {
 		adjMultiplex.add(adjacencyCoTemporalg);
 
 		// Transform into a monoplex graph
-		// SimpleWeightedGraph<Long, DefaultWeightedEdge> monoplexg =
-		// GraphAnalysis.monoplex(adjMultiplex,
-		// contributorIndex);
+		SimpleWeightedGraph<Long, DefaultWeightedEdge> monoplexg = GraphAnalysis.monoplex(adjMultiplex,
+				contributorIndex);
 		// SocialGraph.writeSimpleWeightedGraph2CSV(monoplexg, new
-		// File("Nepal/katmandou-monoplexg_2014-2017.csv"),
+		// File("Allemagne/stuhr-monoplexg_2009-2013.csv"),
 		// Long.valueOf(111)); // Export
 		// // to
 		// // csv
-
 		// Write indicators
 		HashMap<Long, Double> cc1 = GraphAnalysis.clusteringCoefficient1(adjMultiplex, contributorIndex);
 		HashMap<Long, Double> cc2 = GraphAnalysis.clusteringCoefficient2(adjMultiplex, contributorIndex);
 		HashMap<Long, Double> participationList = GraphAnalysis.participationCoefficientMultiplex(adjMultiplex,
 				contributorIndex);
 		GraphAnalysis.writeIndicators(contributorIndex, adjMultiplex, participationList, cc1, cc2,
-				"Nepal/katmandou-multiplex-indicateurs_2014-2017.csv");
+				"Allemagne/stuhr-multiplex-indicateurs_2009-2013.csv");
+
 	}
+
 }

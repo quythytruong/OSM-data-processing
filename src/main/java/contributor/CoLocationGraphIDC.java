@@ -25,7 +25,7 @@ public class CoLocationGraphIDC {
 		// File("idf_contributors_idc_2009-2012.csv"));
 
 		SimpleWeightedGraph<Long, DefaultWeightedEdge> colocationGraph = SocialGraph
-				.createCoLocationGraph(myContributors, bbox, timespan, (double) 100.0);
+				.createCoLocationGraph(myContributors, bbox, timespan, (double) 100.0, "2154");
 		System.out.println("vertices " + colocationGraph.vertexSet().size());
 		System.out.println("edges " + colocationGraph.edgeSet().size());
 
