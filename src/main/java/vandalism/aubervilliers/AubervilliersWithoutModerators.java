@@ -17,20 +17,14 @@ public class AubervilliersWithoutModerators {
 		Set<Long> artisticVandalism = new HashSet<Long>();
 
 		try (Scanner scanner = new Scanner(new File("D:/Users/qttruong/data/aubervilliers/artistic_vandalism.txt"));) {
-			// int nword = 0;
 			while (scanner.hasNext()) {
 				String sent = scanner.next();
-				// nword++;
-				// System.out.printf("%3d) %s%n", nword, sent);
 				artisticVandalism.add(Long.valueOf(sent));
 			}
 		}
 		try (Scanner scanner = new Scanner(new File("D:/Users/qttruong/data/aubervilliers/fantasy_vandalism.txt"));) {
-			// int nword = 0;
 			while (scanner.hasNext()) {
 				String sent = scanner.next();
-				// nword++;
-				// System.out.printf("%3d) %s%n", nword, sent);
 				fantasyVandalism.add(Long.valueOf(sent));
 			}
 		}
@@ -46,19 +40,17 @@ public class AubervilliersWithoutModerators {
 		column += "median_length_out_of_perimeter,";
 		column += "elongation,";
 		column += "convexity,";
-		column += "compacity";
-		// column += "min_dist_surf_bati_bdtopo";
+		column += "compacity,";
+		column += "min_dist_surf_bati_bdtopo,";
+		column += "net_flow";
 
 		Set<double[]> geomIndicators = aubervilliers.getNormalizedIndicators(column, "aubervilliers");
-		// Set<double[]> geomIndicators = bremen.getNormalizedIndicators(column,
-		// "stuhr");
 
 		// Convert set into array
-		double[][] dataGeom = new double[geomIndicators.size()][7];
+		double[][] dataGeom = new double[geomIndicators.size()][9];
 		Map<Long, double[]> indexedBuildings = new HashMap<Long, double[]>();
 		int i = 0;
 		for (double[] row : geomIndicators) {
-			// System.out.println("perimètre =" + row[0] + "; aire =" + row[1]);
 			for (int j = 1; j < row.length; j++)
 				dataGeom[i][j - 1] = row[j];
 			indexedBuildings.put(new Double(row[0]).longValue(), dataGeom[i]);
@@ -76,7 +68,7 @@ public class AubervilliersWithoutModerators {
 		System.out.println(normalbuildings);
 		System.out.println(dataGeom[0].length);
 
-		DENCLUE d1 = new DENCLUE(dataGeom, 0.005, indexedBuildings.size());
+		DENCLUE d1 = new DENCLUE(dataGeom, 0.05, Math.floorDiv(indexedBuildings.size(), 10));
 
 		int artisticVandalismClusterSize1 = 0;
 		int artisticVandalismOutlier = 0;

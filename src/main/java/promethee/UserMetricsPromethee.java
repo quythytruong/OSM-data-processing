@@ -1,4 +1,4 @@
-package contributor;
+package promethee;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,18 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import fr.ign.cogit.cartagen.algorithms.block.deletion.BuildingDeletionPromethee;
 import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.PreferenceFunction;
 import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.PrometheeCandidate;
 import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.PrometheeCriterion;
 import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.PrometheeDecision;
-import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.Type2PreferenceFunction;
-import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.Type4PreferenceFunction;
-import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.Type5PreferenceFunction;
+import fr.ign.cogit.cartagen.util.multicriteriadecision.promethee.Type6PreferenceFunction;
 import fr.ign.cogit.geoxygene.osm.contributor.OSMContributor;
 import fr.ign.cogit.geoxygene.osm.importexport.metrics.OSMContributorAssessment;
 
@@ -29,12 +25,10 @@ import fr.ign.cogit.geoxygene.osm.importexport.metrics.OSMContributorAssessment;
  *
  */
 public class UserMetricsPromethee {
-	private static Logger LOGGER = Logger.getLogger(BuildingDeletionPromethee.class);
 	private Collection<PrometheeCriterion> criteria;
 	private Map<PrometheeCriterion, Double> weights;
 
 	private static String PARAM_NB_CONTRIBUTIONS = "number of contributions";
-	private static String PARAM_P_CREATE = "portion of created objects";
 	private static String PARAM_P_MODIF = "portion of modified objects";
 	private static String PARAM_P_DELETE = "portion of deleted objects";
 	private static String PARAM_P_USED = "portion of used objects";
@@ -45,12 +39,10 @@ public class UserMetricsPromethee {
 		getDefaultCriteria();
 	}
 
-	public List<Integer> compute(Map<Long, OSMContributor> myContributors,
+	public Collection<PrometheeCandidate> compute(Map<Long, OSMContributor> myContributors,
 			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> coeditg,
 			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> useg,
 			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressiong) {
-
-		List<Integer> userRanking = new ArrayList<Integer>();
 
 		Collection<PrometheeCandidate> candidates = new HashSet<PrometheeCandidate>();
 
@@ -65,11 +57,6 @@ public class UserMetricsPromethee {
 
 			// Number of contributions per contributor
 			parameters.put(PARAM_NB_CONTRIBUTIONS, totalContributions);
-
-			// Nb of creations / total contributions
-			int nbCreate = OSMContributorAssessment.getNbCreations(user.getResource());
-			Double pCreate = Double.valueOf(nbCreate) / Double.valueOf(totalContributions);
-			parameters.put(PARAM_P_CREATE, pCreate);
 
 			// Nb of modifications / total contributions
 			int nbModif = OSMContributorAssessment.getNbModification(user.getResource());
@@ -104,6 +91,19 @@ public class UserMetricsPromethee {
 			PrometheeCandidate candidate = new PrometheeCandidate(user, criteriaValues);
 			candidates.add(candidate);
 		}
+
+		return candidates;
+	}
+
+	public List<Integer> computeRanking(Map<Long, OSMContributor> myContributors,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> coeditg,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> useg,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressiong) {
+
+		List<Integer> userRanking = new ArrayList<Integer>();
+
+		Collection<PrometheeCandidate> candidates = compute(myContributors, coeditg, useg, suppressiong);
+
 		PrometheeDecision method = new PrometheeDecision(weights);
 		List<PrometheeCandidate> list = method.makeRankingDecision(candidates);
 		System.out.println("Promethee number of candidates : " + list.size());
@@ -111,12 +111,23 @@ public class UserMetricsPromethee {
 		for (int i = 0; i < list.size(); i++) {
 			userRanking.add(((OSMContributor) list.get(i).getCandidateObject()).getId());
 		}
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("Candidate ranking:");
-			for (PrometheeCandidate cand : list)
-				LOGGER.trace(((OSMContributor) cand.getCandidateObject()).getId());
-		}
+
 		return userRanking;
+	}
+
+	public Map<Integer, Double> getCandidatesNetFlows(Map<Long, OSMContributor> myContributors,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> coeditg,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> useg,
+			DefaultDirectedWeightedGraph<Long, DefaultWeightedEdge> suppressiong) {
+		Collection<PrometheeCandidate> candidates = compute(myContributors, coeditg, useg, suppressiong);
+		PrometheeDecision method = new PrometheeDecision(weights);
+		Map<PrometheeCandidate, Double> netFlows = method.computeNetFlow(candidates);
+		Map<Integer, Double> map = new HashMap<>();
+		for (PrometheeCandidate user : netFlows.keySet()) {
+			int uid = ((OSMContributor) user.getCandidateObject()).getId();
+			map.put(uid, netFlows.get(user));
+		}
+		return map;
 	}
 
 	private void getDefaultCriteria() {
@@ -124,34 +135,35 @@ public class UserMetricsPromethee {
 		this.weights = new HashMap<>();
 		// nb of contributions criterion
 		PrometheeCriterion nbContrib = new BuildNbContributionsCriterion("nb of contributions",
-				new Type5PreferenceFunction(1., 32.));
+				new Type6PreferenceFunction(0.05));
+
 		this.criteria.add(nbContrib);
-		this.weights.put(nbContrib, 0.3);
+		this.weights.put(nbContrib, 0.2);
 
 		// pModif criterion
-		PrometheeCriterion pModif = new BuildPModifyCriterion("pModif", new Type4PreferenceFunction(0.2686, 0.4130));
+		PrometheeCriterion pModif = new BuildPModifyCriterion("pModif", new Type6PreferenceFunction(0.02));
 		this.criteria.add(pModif);
-		this.weights.put(pModif, 0.1);
+		this.weights.put(pModif, 0.25);
 
 		// pDelete criterion
-		PrometheeCriterion pDelete = new BuildPDeleteCriterion("pDelete", new Type4PreferenceFunction(0.0462, 0.1685));
+		PrometheeCriterion pDelete = new BuildPDeleteCriterion("pDelete", new Type6PreferenceFunction(0.1));
 		this.criteria.add(pDelete);
-		this.weights.put(pDelete, 0.1);
+		this.weights.put(pDelete, 0.25);
 
 		// pUsed criterion
-		PrometheeCriterion pUsed = new BuildPUsedCriterion("pUsed", new Type2PreferenceFunction(0.04886));
+		PrometheeCriterion pUsed = new BuildPUsedCriterion("pUsed", new Type6PreferenceFunction(0.05));
 		this.criteria.add(pUsed);
 		this.weights.put(pUsed, 0.2);
 
 		// pCoedited criterion
-		PrometheeCriterion pCoedited = new BuildPCoeditedCriterion("pCoedited", new Type2PreferenceFunction(0.2154));
+		PrometheeCriterion pCoedited = new BuildPCoeditedCriterion("pCoedited", new Type6PreferenceFunction(0.2));
 		this.criteria.add(pCoedited);
-		this.weights.put(pCoedited, -0.1);
+		this.weights.put(pCoedited, 0.05);
 
 		// pDeleted criterion
-		PrometheeCriterion pDeleted = new BuildPDeletedCriterion("pDeleted", new Type2PreferenceFunction(0.04615));
+		PrometheeCriterion pDeleted = new BuildPDeletedCriterion("pDeleted", new Type6PreferenceFunction(0.2));
 		this.criteria.add(pDeleted);
-		this.weights.put(pDeleted, -0.2);
+		this.weights.put(pDeleted, 0.05);
 
 	}
 
@@ -165,19 +177,6 @@ public class UserMetricsPromethee {
 		public double value(Map<String, Object> param) {
 			double nbContributions = Double.valueOf((Integer) param.get(PARAM_NB_CONTRIBUTIONS));
 			return nbContributions;
-		}
-	}
-
-	class BuildPCreateCriterion extends PrometheeCriterion {
-
-		public BuildPCreateCriterion(String name, PreferenceFunction preferenceFunction) {
-			super(name, preferenceFunction);
-		}
-
-		@Override
-		public double value(Map<String, Object> param) {
-			double v = (Double) param.get(PARAM_P_CREATE);
-			return v;
 		}
 	}
 
@@ -229,7 +228,10 @@ public class UserMetricsPromethee {
 		@Override
 		public double value(Map<String, Object> param) {
 			double v = (Double) param.get(PARAM_P_COEDITED);
-			return v;
+			if (1 - v != 0)
+				return Math.log(1 - v);
+			else
+				return Math.log(0.0000000001);
 		}
 	}
 
@@ -242,7 +244,10 @@ public class UserMetricsPromethee {
 		@Override
 		public double value(Map<String, Object> param) {
 			double v = (Double) param.get(PARAM_P_DELETED);
-			return v;
+			if (1 - v != 0)
+				return Math.log(1 - v);
+			else
+				return Math.log(0.0000000001);
 		}
 	}
 
