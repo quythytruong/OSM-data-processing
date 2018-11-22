@@ -18,7 +18,7 @@ public class GeometricIndicators {
 		BuildingAssessment b = new BuildingAssessment("localhost", "5432", "idf", "postgres", "postgres");
 		b.loadBuildings("Noisy-le-Grand", "2018-02-13T23:59:59Z");
 
-		Map<Long, IFeature> geometries = b.buildGeometry();
+		Map<Long, IFeature> geometries = b.buildGeometry("2154");
 
 		Map<Long, Object[]> indicatorGeom = new HashMap<Long, Object[]>();
 		for (IFeature feat : geometries.values()) {

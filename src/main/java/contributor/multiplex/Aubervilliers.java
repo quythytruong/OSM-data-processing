@@ -185,7 +185,7 @@ public class Aubervilliers {
 		ContributorAssessment.FILE_HEADER = "uid," + "total_contributions," + "p_creation," + "p_modification,"
 				+ "p_delete," + "p_is_used," + "p_is_edited," + "p_is_deleted," + "nbWeeks," + "focalisation,"
 				+ "lonMin," + "latMin," + "lonMax," + "latMax," + "area_mean_chgst," + "area_aubervilliers_bbox";
-		ContributorAssessment.toCSV(indicatorUser, new File("Aubervilliers/user-features_2000-20180213.csv"));
+		ContributorAssessment.toCSV(indicatorUser, new File("Aubervilliers/user-features_2000-20180213-way_geom.csv"));
 
 	}
 
