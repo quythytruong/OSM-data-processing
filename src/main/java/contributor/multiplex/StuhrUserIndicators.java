@@ -29,7 +29,7 @@ public class StuhrUserIndicators {
 		LoadFromPostGIS loader = new LoadFromPostGIS("localhost", "5432", "bremen", "postgres", "postgres");
 		// Get the city boundaries
 		Double[] bbox = loader.getCityBoundary("Stuhr", "2014-01-01");
-		String[] timespan = { "2000-01-01", "2018-02-13T23:59:59Z" };
+		String[] timespan = { "2000-01-01", "2018-04-05T23:59:59Z" };
 
 		// Load contributions
 		// Get nodes
@@ -57,9 +57,9 @@ public class StuhrUserIndicators {
 				object.wayComposition.add(((OSMWay) r.getGeom()).getVertices());
 
 		// Configure Social Graph class static attribute
-		SocialGraph.dbName = "idf";
+		SocialGraph.dbName = "bremen";
 
-		// Make a summary of the contributors in Aubervilliers
+		// Make a summary of the contributors in Stuhr
 		HashMap<Long, OSMContributor> myContributors = ContributorAssessment.contributorSummary(loader.myJavaObjects);
 
 		/**************************
@@ -146,23 +146,23 @@ public class StuhrUserIndicators {
 			Double latMax = meanChangesetExtent[3];
 
 			IDirectPosition lowerCorner = CRSConversion.wgs84ToLambert93(lonMin, latMin);
-			lowerCorner = (IDirectPosition) CRSConversion.changeCRS(lowerCorner.toGM_Point(), "2154", "31467", true,
-					true);
+			lowerCorner = CRSConversion.changeCRS(lowerCorner.toGM_Point(), "2154", "31467", true, true).centroid();
+			// Le centroide d'un point est le point lui-même...
 			IDirectPosition upperCorner = CRSConversion.wgs84ToLambert93(lonMax, latMax);
-			upperCorner = (IDirectPosition) CRSConversion.changeCRS(upperCorner.toGM_Point(), "2154", "31467", true,
-					true);
+			upperCorner = CRSConversion.changeCRS(upperCorner.toGM_Point(), "2154", "31467", true, true).centroid();
 
 			IEnvelope chgsetEnvelope = new GM_Envelope(upperCorner, lowerCorner);
 
 			IDirectPosition bboxLowerCorner = CRSConversion.wgs84ToLambert93(bbox[2], bbox[3]);
-			bboxLowerCorner = (IDirectPosition) CRSConversion.changeCRS(bboxLowerCorner.toGM_Point(), "2154", "31467",
-					true, true);
+			bboxLowerCorner = CRSConversion.changeCRS(bboxLowerCorner.toGM_Point(), "2154", "31467", true, true)
+					.centroid();
 			IDirectPosition bboxUpperCorner = CRSConversion.wgs84ToLambert93(bbox[0], bbox[1]);
-			bboxUpperCorner = (IDirectPosition) CRSConversion.changeCRS(bboxUpperCorner.toGM_Point(), "2154", "31467",
-					true, true);
+			bboxUpperCorner = (IDirectPosition) CRSConversion
+					.changeCRS(bboxUpperCorner.toGM_Point(), "2154", "31467", true, true).centroid();
 
-			IEnvelope aubervilliersEnvelope = new GM_Envelope(CRSConversion.wgs84ToLambert93(bbox[2], bbox[3]),
+			IEnvelope stuhrEnvelope = new GM_Envelope(CRSConversion.wgs84ToLambert93(bbox[2], bbox[3]),
 					CRSConversion.wgs84ToLambert93(bbox[0], bbox[1]));
+			stuhrEnvelope = CRSConversion.changeCRS(stuhrEnvelope.getGeom(), "2154", "31467", true, true).envelope();
 
 			Double focalisation = 0.0;
 			if (chgsetEnvelope.getGeom().area() == 0.0)
@@ -172,12 +172,12 @@ public class StuhrUserIndicators {
 				else
 					focalisation = 1.0;
 			else {
-				if (aubervilliersEnvelope.contains(chgsetEnvelope))
+				if (stuhrEnvelope.contains(chgsetEnvelope))
 					focalisation = 1.0;
-				else if (chgsetEnvelope.contains(aubervilliersEnvelope))
-					focalisation = aubervilliersEnvelope.getGeom().area() / chgsetEnvelope.getGeom().area();
+				else if (chgsetEnvelope.contains(stuhrEnvelope))
+					focalisation = stuhrEnvelope.getGeom().area() / chgsetEnvelope.getGeom().area();
 				else
-					focalisation = aubervilliersEnvelope.getGeom().intersection(chgsetEnvelope.getGeom()).area()
+					focalisation = stuhrEnvelope.getGeom().intersection(chgsetEnvelope.getGeom()).area()
 							/ chgsetEnvelope.getGeom().area();
 			}
 
@@ -189,14 +189,14 @@ public class StuhrUserIndicators {
 
 			Object[] indicator = { totalContributions, pCreate, pModif, pDelete, pUsed, pCoedited, pDeleted, nbWeeks,
 					focalisation, lonMin, latMin, lonMax, latMax, chgsetEnvelope.getGeom().area(),
-					aubervilliersEnvelope.getGeom().area() };
+					stuhrEnvelope.getGeom().area() };
 			indicatorUser.put(Long.valueOf(user.getId()), indicator);
 
 		}
 		ContributorAssessment.FILE_HEADER = "uid," + "total_contributions," + "p_creation," + "p_modification,"
 				+ "p_delete," + "p_is_used," + "p_is_edited," + "p_is_deleted," + "nbWeeks," + "focalisation,"
-				+ "lonMin," + "latMin," + "lonMax," + "latMax," + "area_mean_chgst," + "area_aubervilliers_bbox";
-		ContributorAssessment.toCSV(indicatorUser, new File("Aubervilliers/user-features_2000-20180213-way_geom.csv"));
+				+ "lonMin," + "latMin," + "lonMax," + "latMax," + "area_mean_chgst," + "area_stuhr_bbox";
+		ContributorAssessment.toCSV(indicatorUser, new File("Stuhr/user-features_2000-20180405-way_geom.csv"));
 
 	}
 

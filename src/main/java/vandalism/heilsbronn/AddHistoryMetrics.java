@@ -1,4 +1,4 @@
-package vandalism.bremen.stuhr;
+package vandalism.heilsbronn;
 
 import fr.ign.cogit.geoxygene.osm.importexport.OSMObject;
 import fr.ign.cogit.geoxygene.osm.importexport.OSMResource;
@@ -8,12 +8,13 @@ import fr.ign.cogit.geoxygene.osm.importexport.postgis.LoadFromPostGIS;
 
 public class AddHistoryMetrics {
 	public static void main(String[] args) throws Exception {
-		LoadFromPostGIS ld = new LoadFromPostGIS("localhost", "5432", "idf", "postgres", "postgres");
-		String select = "SELECT a.*, hstore_to_json(a.tags) FROM relation a, indicators.aubervilliers b "
-				+ "WHERE b.id = a.id AND b.v_contrib = a.vrel AND b.is_way IS FALSE";
-		ld.selectFromDB(select, "relation");
+		LoadFromPostGIS ld = new LoadFromPostGIS("localhost", "5432", "heilsbronn", "postgres", "postgres");
 
-		OSMObject.dbName = "idf";
+		String select = "SELECT a.*, hstore_to_json(a.tags) FROM way a, indicators.heilsbronn b "
+				+ "WHERE b.id = a.id AND b.v_contrib = a.vway AND b.is_way IS TRUE";
+		ld.selectFromDB(select, "way");
+
+		OSMObject.dbName = "heilsbronn";
 
 		StringBuffer query = new StringBuffer();
 		int it = 0;
@@ -30,7 +31,7 @@ public class AddHistoryMetrics {
 			int nbTagEdit = OSMObjectAssessment.getNbTagEdition(obj);
 			int nbTagAdd = OSMObjectAssessment.getNbTagAddition(obj);
 			int nbTagDel = OSMObjectAssessment.getNbTagDelete(obj);
-			query.append("UPDATE indicators.aubervilliers SET n_versions=" + nbVersions + ", n_users=" + nbUsers
+			query.append("UPDATE indicators.heilsbronn SET n_versions=" + nbVersions + ", n_users=" + nbUsers
 					+ ", n_del=" + nbDeletes + ", n_geom_edit=" + nbGeomEdit + ", n_tag_edit=" + nbTagEdit
 					+ ", n_tag_add=" + nbTagAdd + ", n_tag_del=" + nbTagDel + " WHERE id = " + r.getId() + ";");
 			it++;
@@ -49,7 +50,7 @@ public class AddHistoryMetrics {
 			boolean isTagCreation = OSMResourceQualityAssessment.isTagCreation(latest.getTags(), previous.getTags());
 			boolean isTagModif = OSMResourceQualityAssessment.isTagModification(latest, previous);
 			boolean isTagDel = OSMResourceQualityAssessment.isTagDelete(latest.getTags(), previous.getTags());
-			query.append("UPDATE indicators.aubervilliers SET is_geom_edit_prev_version = " + isGeomEdit
+			query.append("UPDATE indicators.heilsbronn SET is_geom_edit_prev_version = " + isGeomEdit
 					+ ", is_tag_edit_prev_version = " + isTagModif + ",is_tag_add_prev_version =" + isTagCreation
 					+ ",is_tag_del_prev_version = " + isTagDel + " WHERE id = " + r.getId() + ";");
 
