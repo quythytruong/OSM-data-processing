@@ -1,4 +1,4 @@
-package vandalism.lannilis;
+package contributor;
 
 import java.io.File;
 import java.util.HashMap;
@@ -23,8 +23,7 @@ import fr.ign.cogit.geoxygene.osm.importexport.postgis.ChangesetRetriever;
 import fr.ign.cogit.geoxygene.osm.importexport.postgis.LoadFromPostGIS;
 import fr.ign.cogit.geoxygene.spatial.coordgeom.GM_Envelope;
 
-public class UserIndicators {
-
+public class BondyUserIndicators {
 	public static void main(String[] args) throws Exception {
 		LoadFromPostGIS loader = new LoadFromPostGIS("localhost", "5432", "bretagne", "postgres", "postgres");
 		// Get the city boundaries
@@ -56,6 +55,8 @@ public class UserIndicators {
 			for (OSMResource r : object.getContributions())
 				object.wayComposition.add(((OSMWay) r.getGeom()).getVertices());
 
+		OSMResourceQualityAssessment osmRsrcAssmt = new OSMResourceQualityAssessment(loader.myJavaObjects);
+		osmRsrcAssmt.writeOSMObjectCSV("Bretagne/fougeres-contributions-20180212.csv");
 		// Configure Social Graph class static attribute
 		SocialGraph.dbName = "bretagne";
 
@@ -175,7 +176,7 @@ public class UserIndicators {
 		}
 		ContributorAssessment.FILE_HEADER = "uid," + "total_contributions," + "p_creation," + "p_modification,"
 				+ "p_delete," + "p_is_used," + "p_is_edited," + "p_is_deleted," + "nbWeeks," + "focalisation,"
-				+ "lonMin," + "latMin," + "lonMax," + "latMax," + "area_mean_chgst," + "area_bbox";
+				+ "lonMin," + "latMin," + "lonMax," + "latMax," + "area_mean_chgst," + "area_aubervilliers_bbox";
 		ContributorAssessment.toCSV(indicatorUser,
 				new File("Bretagne/fougeres-user-features_2000-20180213-way_geom.csv"));
 

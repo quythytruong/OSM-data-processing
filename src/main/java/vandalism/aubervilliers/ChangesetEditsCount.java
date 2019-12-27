@@ -16,19 +16,19 @@ import fr.ign.cogit.geoxygene.osm.importexport.postgis.ChangesetRetriever;
 public class ChangesetEditsCount {
 
 	public static void main(String[] args) throws Exception {
-		ChangesetRetriever chgset = new ChangesetRetriever("localhost", "5432", "idf", "postgres", "postgres");
+		ChangesetRetriever chgset = new ChangesetRetriever("localhost", "5432", "bretagne", "postgres", "postgres");
 
 		// Cherche les changesets des données de Aubervilliers qui ne sont pas
 		// encore stockés dans la base de données
 		String query = "SELECT aubervilliers_building.id, changeset.changesetid FROM "
-				+ "(SELECT a.id, a.v_contrib, way.changeset, way.datemodif FROM indicators.aubervilliers a, "
+				+ "(SELECT a.id, a.v_contrib, way.changeset, way.datemodif FROM indicators.fougeres a, "
 				+ "way WHERE a.is_way IS TRUE AND a.chgst_edits IS NULL AND a.id = way.id "
 				+ "AND a.v_contrib = way.vway) as aubervilliers_building,"
 				+ "	changeset WHERE aubervilliers_building.changeset = changeset.changesetid;";
-		query = "SELECT a.id, a.v_contrib, way.changeset as changesetid FROM indicators.aubervilliers a, "
-				+ "way WHERE a.is_way IS TRUE AND a.chgst_edits IS NULL AND a.id = way.id "
+		query = "SELECT a.id, a.v_contrib, way.changeset as changesetid FROM indicators.fougeres a, "
+				+ "way WHERE a.is_way IS TRUE AND a.chgst_edits IS NULL AND a.id =	 way.id "
 				+ "AND a.v_contrib = way.vway;";
-		query = "SELECT a.id, a.v_contrib, relation.changeset as changesetid FROM indicators.aubervilliers a, "
+		query = "SELECT a.id, a.v_contrib, relation.changeset as changesetid FROM indicators.fougeres a, "
 				+ "relation WHERE a.is_way IS FALSE AND a.chgst_edits IS NULL AND a.id = relation.id "
 				+ "AND a.v_contrib = relation.vrel;";
 
@@ -53,7 +53,7 @@ public class ChangesetEditsCount {
 
 		for (Integer userID : userChangeset.keySet()) {
 			Integer nEdits = chgstEdits.get(userChangeset.get(userID));
-			String update = "UPDATE indicators.aubervilliers SET chgst_edits=" + nEdits + " WHERE id = " + userID;
+			String update = "UPDATE indicators.fougeres SET chgst_edits=" + nEdits + " WHERE id = " + userID;
 			System.out.println(update);
 			chgset.executeQuery(update);
 		}

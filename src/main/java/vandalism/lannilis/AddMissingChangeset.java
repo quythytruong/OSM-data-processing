@@ -20,7 +20,7 @@ public class AddMissingChangeset {
 		// String query = "SELECT DISTINCT changeset FROM way "
 		// + "WHERE changeset NOT IN (SELECT changesetid FROM changeset)";
 
-		String query = "SELECT DISTINCT changeset FROM way WHERE id IN (SELECT id FROM indicators.lannilis) ";
+		String query = "SELECT DISTINCT changeset FROM way WHERE id IN (SELECT id FROM indicators.fougeres) ";
 
 		ResultSet r = chgset.executeQuery(query);
 		while (r.next()) {
